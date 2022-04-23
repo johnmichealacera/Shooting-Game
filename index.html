@@ -52,22 +52,17 @@ function showBird(){
 		
 		let birdFlight = setInterval(flight, 1);
 		function flight(){
-		console.log('error');
-		//
-		
-				if(main.children[0].style.right === '0px'){
+				if(main?.children[0]?.style?.right === '0px'){
 					clearInterval(birdFlight);
 					clearInterval(birdInterval);
 					main.innerHTML = "";
 					background.pause();
 					start.style.display = 'block';
 					alert('You did not shoot all the birds. Game over.');
-					
 				}
 				else{
 					bird.style.right = position+'px';
 					position--;
-					
 				}
 			}
 	}
@@ -86,26 +81,28 @@ start.addEventListener('click', function(){
 	
 main.addEventListener('click', function(ev){
 	if(ev.target.nodeName === 'IMG'){
-		//alert('headshot');
 		boom.play();
 		ev.target.remove();
 		count++;
 		score.innerHTML = `Score is ${count}`;
-		if(count === 3){
-			clearInterval(birdInterval);
-			clearInterval(birdFlight);
-			game.play();
-			background.pause();
-			alert('Stage 1 cleared');
-			start.style.display = 'block';
+		if(count === 20){
 			main.innerHTML = "";
+			score.innerHTML = '';
+			const willPlayAgain = confirm('Congrats on clearing the game, play again?');
+			if (!willPlayAgain) {
+				start.style.display = 'block';
+				background.pause();
+				clearInterval(birdInterval);
+			} else {
+				start.click();
+			}
 		}
 	}
 });
 
 main.addEventListener('mouseover', function(ev){
 	if(ev.target.nodeName === 'IMG'){
-		ev.target.style.cursor = 'pointer';
+		ev.target.style.cursor = 'crosshair';
 	}
 });
 </script>
