@@ -11,7 +11,7 @@ function showBird(){
 	if(main.childElementCount<20){
 		let bird = document.createElement('img');
 		let position = 1500;
-		bird.src = 'bird.gif';
+		bird.src = 'bird.webp';
 		bird.style.height = '80px';
 		bird.style.width = '80px';
 		bird.style.position = 'absolute';
@@ -62,6 +62,8 @@ main.addEventListener('click', function(ev){
 		if(count === 20){
 			main.innerHTML = "";
 			score.innerHTML = '';
+			background.pause();
+			game.play();
 			const willPlayAgain = confirm('Congrats on clearing the game, play again?');
 			if (!willPlayAgain) {
 				start.style.display = 'block';
