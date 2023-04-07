@@ -13,8 +13,8 @@ let gameState;
 
 const showBird = () => {
 	if (gameState === 'playing') {
+		let position;
 		let bird = document.createElement('img');
-		let position = 1400;
 		bird.src = 'bird.gif';
 		bird.style.height = '80px';
 		bird.style.width = '80px';
@@ -22,7 +22,9 @@ const showBird = () => {
 		const screenSize = document.documentElement.clientWidth || window.innerWidth;
 		if (screenSize <= 480) {
 			bird.style.top = Math.random()*300+'px';
+			position = 700;
 		} else {
+			position = 1400;
 			bird.style.top = Math.random()*650+'px';
 		}
 		bird.style.right = position+'px';
@@ -71,10 +73,10 @@ main.addEventListener('click', (ev) => {
 		count++;
 		score.innerHTML = `Score is ${count}`;
 		if (count % 10 === 0 && gameState === 'playing') {
-			spawnTime = spawnTime - level*100;
+			spawnTime = spawnTime <= 0 ? 0 : spawnTime - level*100;
 			level++;
 			levelLabel.innerHTML = `Level ${level}`;
-			flightSpeed = flightSpeed === 0 ? 0 : flightSpeed-count;
+			flightSpeed = flightSpeed === 0 ? 0 : flightSpeed-level;
 			clearInterval(birdInterval);
 			birdInterval();
 		}
