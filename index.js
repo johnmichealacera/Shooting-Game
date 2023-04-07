@@ -74,7 +74,7 @@ main.addEventListener('click', (ev) => {
 			spawnTime = spawnTime - level*100;
 			level++;
 			levelLabel.innerHTML = `Level ${level}`;
-			flightSpeed = flightSpeed-count;
+			flightSpeed = flightSpeed === 0 ? 0 : flightSpeed-count;
 			clearInterval(birdInterval);
 			birdInterval();
 		}
