@@ -15,7 +15,7 @@ const showBird = () => {
 	if (gameState === 'playing') {
 		let bird = document.createElement('img');
 		let position = 1400;
-		bird.src = 'bird.webp';
+		bird.src = 'bird.gif';
 		bird.style.height = '80px';
 		bird.style.width = '80px';
 		bird.style.position = 'absolute';
