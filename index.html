@@ -1,37 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<link rel="stylesheet" href="style.css">
-	<title>Bird Hunter</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+	<meta name="description" content="Bird Hunter — a lightweight browser shooting game built with vanilla JavaScript.">
+	<meta name="color-scheme" content="dark light">
+	<title>Bird Hunter — Sky Range</title>
 	<link rel="icon" href="shootingbird.png">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="style.css">
 </head>
 <body>
-	<div class="wrapper">
-		<div class="startGame">
-			<input type="submit" value="Start Game" id="start">
+	<div class="wrapper" id="app">
+		<header class="top-bar" aria-label="Game status">
+			<div class="brand">
+				<span class="brand__mark" aria-hidden="true"></span>
+				<div class="brand__text">
+					<span class="brand__title">Sky Range</span>
+					<span class="brand__tag">Bird Hunter</span>
+				</div>
+			</div>
+			<div class="hud" role="status" aria-live="polite">
+				<div class="hud__item">
+					<span class="hud__label">Level</span>
+					<span class="hud__value" id="level">1</span>
+				</div>
+				<div class="hud__item hud__item--score">
+					<span class="hud__label">Score</span>
+					<span class="hud__value" id="score">0</span>
+				</div>
+			</div>
+		</header>
+
+		<section class="playfield" aria-label="Game area">
+			<div class="playfield__inner">
+				<div class="birdTitle">
+					<h1>Hold the line</h1>
+					<p class="birdTitle__hint">Click birds before they reach the left edge.</p>
+				</div>
+				<div id="main" class="game-surface"></div>
+			</div>
+		</section>
+
+		<div class="overlay overlay--start" id="start-overlay" aria-hidden="false">
+			<div class="hero-card">
+				<p class="hero-card__eyebrow">Vanilla JS · No build step</p>
+				<h2 class="hero-card__title">Sky Range</h2>
+				<p class="hero-card__lede">Aim, click, and clear the sky. Difficulty ramps every ten hits — how long can you last?</p>
+				<button type="button" class="btn btn--primary" id="start">
+					<span class="btn__shine" aria-hidden="true"></span>
+					Start game
+				</button>
+				<p class="hero-card__note">Sound on for ambience &amp; feedback.</p>
+			</div>
 		</div>
-		<div class="birdTitle">
-			<h1>Shoot the birds</h1>
-			<h2 id="level">Level 1</h2>
-			<h3 id="score">Score is 0</h3>
+
+		<div class="overlay overlay--gameover hidden" id="game-over-overlay" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="game-over-title">
+			<div class="modal-card">
+				<h2 class="modal-card__title" id="game-over-title">Game over</h2>
+				<p class="modal-card__text">A bird slipped past your shot.</p>
+				<p class="modal-card__score">Final score <strong id="final-score">0</strong></p>
+				<button type="button" class="btn btn--primary" id="play-again">Play again</button>
+			</div>
 		</div>
-		<div id="main">
-		</div>
-		<audio id="myAudio">
-				<source src="boom.mp3" type="audio/mpeg">
-				Your browser does not support the audio element.
+
+		<audio id="myAudio" preload="auto">
+			<source src="boom.mp3" type="audio/mpeg">
 		</audio>
-		<audio id="gameover">
-				<source src="game.mp3" type="audio/mpeg">
-				Your browser does not support the audio element.
+		<audio id="gameover" preload="auto">
+			<source src="game.mp3" type="audio/mpeg">
 		</audio>
-		<audio id="background">
-				<source src="background.mp3" type="audio/mpeg">
-				Your browser does not support the audio element.
+		<audio id="background" preload="auto">
+			<source src="background.mp3" type="audio/mpeg">
 		</audio>
 	</div>
+	<script src="./index.js"></script>
 </body>
 </html>
-<script src="./index.js">
-</script>

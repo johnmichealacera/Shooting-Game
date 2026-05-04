@@ -1,98 +1,154 @@
-let main = document.getElementById('main');
-let score = document.getElementById('score');
-let levelLabel = document.getElementById('level');
-let boom = document.getElementById("myAudio");
-let game = document.getElementById('gameover'); 
-let background = document.getElementById('background'); 
-let start = document.getElementById('start');
+const main = document.getElementById("main");
+const score = document.getElementById("score");
+const levelLabel = document.getElementById("level");
+const finalScore = document.getElementById("final-score");
+const boom = document.getElementById("myAudio");
+const game = document.getElementById("gameover");
+const background = document.getElementById("background");
+const start = document.getElementById("start");
+const playAgain = document.getElementById("play-again");
+const startOverlay = document.getElementById("start-overlay");
+const gameOverOverlay = document.getElementById("game-over-overlay");
+const app = document.getElementById("app");
+
 let count;
 let level = 1;
 let flightSpeed = 50;
 let spawnTime = 3000;
 let gameState;
+/** @type {ReturnType<typeof setInterval> | null} */
+let spawnIntervalId = null;
 
-const showBird = () => {
-	if (gameState === 'playing') {
-		let position;
-		let bird = document.createElement('img');
-		bird.src = 'bird.gif';
-		bird.style.height = '80px';
-		bird.style.width = '80px';
-		bird.style.position = 'absolute';
-		const screenSize = document.documentElement.clientWidth || window.innerWidth;
-		if (screenSize <= 480) {
-			bird.style.top = Math.random()*300+'px';
-			position = 700;
-		} else {
-			position = 1400;
-			bird.style.top = Math.random()*650+'px';
-		}
-		bird.style.right = position+'px';
-		main.appendChild(bird);
-		const flight = () => {
-			if(Array.from(main?.children)?.find((child) => child.style.right === '0px')){
-				main.innerHTML = "";
-				background.pause();
-				start.style.display = 'block';
-				game.play();
-				gameState = 'gameOver';
-				alert('You did not shoot all the birds. Game over.');
-				clearInterval(birdFlight);
-				clearInterval(birdInterval);
-			}
-			else{
-				bird.style.right = position+'px';
-				position--;
-			}
-		}
-		const birdFlight = () => setInterval(flight, flightSpeed);
-		birdFlight();
-	}	
-}
+const clearSpawnTimer = () => {
+	if (spawnIntervalId !== null) {
+		clearInterval(spawnIntervalId);
+		spawnIntervalId = null;
+	}
+};
 
-const birdInterval = () => setInterval(showBird, spawnTime);
+const startSpawnTimer = () => {
+	clearSpawnTimer();
+	spawnIntervalId = setInterval(showBird, spawnTime);
+};
 
-start.addEventListener('click', () => {
-	gameState = 'playing';
+const setOverlays = (phase) => {
+	if (phase === "menu") {
+		startOverlay.classList.remove("hidden");
+		startOverlay.setAttribute("aria-hidden", "false");
+		gameOverOverlay.classList.add("hidden");
+		gameOverOverlay.setAttribute("aria-hidden", "true");
+		app.classList.remove("is-playing");
+	} else if (phase === "playing") {
+		startOverlay.classList.add("hidden");
+		startOverlay.setAttribute("aria-hidden", "true");
+		gameOverOverlay.classList.add("hidden");
+		gameOverOverlay.setAttribute("aria-hidden", "true");
+		app.classList.add("is-playing");
+	} else if (phase === "gameover") {
+		startOverlay.classList.add("hidden");
+		startOverlay.setAttribute("aria-hidden", "true");
+		gameOverOverlay.classList.remove("hidden");
+		gameOverOverlay.setAttribute("aria-hidden", "false");
+		app.classList.remove("is-playing");
+	}
+};
+
+const beginGame = () => {
+	gameState = "playing";
 	flightSpeed = 50;
 	spawnTime = 6000;
 	level = 1;
-	levelLabel.innerHTML = `Level ${level}`;
-	start.style.display = 'none';
+	levelLabel.textContent = String(level);
+	setOverlays("playing");
 	count = 0;
-	score.innerHTML = `Score is ${count}`;
+	score.textContent = String(count);
+	main.innerHTML = "";
 	background.play();
 	background.loop = true;
-	birdInterval();
-});
-	
-main.addEventListener('click', (ev) => {
-	if (ev.target.nodeName === 'IMG') {
+	startSpawnTimer();
+};
+
+const showBird = () => {
+	if (gameState !== "playing") return;
+
+	let position;
+	const bird = document.createElement("img");
+	bird.src = "bird.gif";
+	bird.alt = "";
+	bird.style.position = "absolute";
+
+	const w = Math.max(1, main.clientWidth);
+	const h = Math.max(1, main.clientHeight);
+	const birdSize = Math.min(80, Math.max(32, Math.round(h * 0.16)));
+	bird.style.height = `${birdSize}px`;
+	bird.style.width = `${birdSize}px`;
+
+	const pad = 6;
+	const topMax = Math.max(pad, h - birdSize - pad);
+	bird.style.top = `${pad + Math.random() * topMax}px`;
+
+	/* Start just past the right edge so birds enter smoothly on any screen width */
+	position = Math.round(w + Math.max(120, w * 0.2));
+	bird.style.right = `${position}px`;
+	main.appendChild(bird);
+
+	const flight = () => {
+		if (!bird.isConnected || gameState !== "playing") {
+			clearInterval(flightIntervalId);
+			return;
+		}
+		if (Array.from(main?.children ?? []).find((child) => child.style.right === "0px")) {
+			main.innerHTML = "";
+			background.pause();
+			clearSpawnTimer();
+			gameState = "gameOver";
+			game.play();
+			if (finalScore) finalScore.textContent = String(count);
+			setOverlays("gameover");
+			playAgain?.focus();
+			clearInterval(flightIntervalId);
+			return;
+		}
+		bird.style.right = position + "px";
+		position--;
+	};
+	const flightIntervalId = setInterval(flight, flightSpeed);
+};
+
+main.addEventListener("click", (ev) => {
+	if (ev.target.nodeName === "IMG") {
 		boom.play();
 		ev.target.remove();
 		count++;
-		score.innerHTML = `Score is ${count}`;
-		if (count % 10 === 0 && gameState === 'playing') {
-			spawnTime = spawnTime <= 0 ? 0 : spawnTime - level*100;
+		score.textContent = String(count);
+		if (count % 10 === 0 && gameState === "playing") {
+			spawnTime = spawnTime <= 0 ? 0 : spawnTime - level * 100;
 			level++;
-			levelLabel.innerHTML = `Level ${level}`;
-			flightSpeed = flightSpeed === 0 ? 0 : flightSpeed-level;
-			clearInterval(birdInterval);
-			birdInterval();
+			levelLabel.textContent = String(level);
+			flightSpeed = flightSpeed === 0 ? 0 : flightSpeed - level;
+			startSpawnTimer();
 		}
 	}
 });
 
-main.addEventListener('mouseover', function(ev){
-	if(ev.target.nodeName === 'IMG'){
-		ev.target.style.cursor = 'crosshair';
+main.addEventListener("mouseover", (ev) => {
+	if (ev.target.nodeName === "IMG") {
+		ev.target.style.cursor = "crosshair";
 	}
 });
 
+start.addEventListener("click", () => {
+	beginGame();
+});
+
+playAgain.addEventListener("click", () => {
+	beginGame();
+});
+
 const loadResources = () => {
-	background.preload = true;
-	boom.preload = true;
-	game.preload = true;
-}
+	background.preload = "auto";
+	boom.preload = "auto";
+	game.preload = "auto";
+};
 
 loadResources();

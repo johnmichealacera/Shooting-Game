@@ -1,23 +1,58 @@
-# **Shooting Bird Game**
-A simple shooting game written in pure vanilla JavaScript. To play the game, clone the repository and open the `index.html` file in your web browser.
+# Sky Range (Bird Hunter)
 
-## How to Play
-Click start game and use the mouse to aim the gun and click to shoot the birds. The speed of the birds and number of bird spawns increases per level. The game ends when atleast one bird makes it to the leftmost corner of the screen.
+A small **browser shooting game** built with **vanilla HTML, CSS, and JavaScript** — no bundler, no framework, and easy to open locally or host as static files. Birds fly in from the right; click them before any reach the **left edge**. Every **10 hits** the difficulty ramps up (faster birds, quicker spawns) until one slips through.
+
+## Quick start
+
+1. Clone or download this repository.
+2. Open `index.html` in a modern desktop or mobile browser (Chrome, Firefox, Safari, Edge).
+
+Optional: serve the folder with any static server if you prefer not to open the file directly.
+
+## How to play
+
+- **Start** — Use the **Start game** button on the welcome screen.
+- **Aim & shoot** — Move the pointer over a bird and **click** to remove it.
+- **Lose condition** — If **any** bird reaches the left side of the playfield, the round ends.
+- **Audio** — Background loop, hit sound, and game-over sting (mute the tab if you prefer silence).
 
 ## Controls
-Mouse: Aim gun and shoot birds
 
-## Game Screenshots
-- In game
-![Screenshot of the Game](https://user-images.githubusercontent.com/54732020/230834111-b251f978-98e6-428d-81c0-938c869d6940.png)
-- Game over
-![Screenshot of the Game](https://user-images.githubusercontent.com/54732020/230834161-ec7a50ed-49d9-47fe-b6f8-ab7ce5b554c5.png)
+| Input  | Action        |
+| ------ | ------------- |
+| Mouse  | Aim and shoot |
+| Touch  | Tap birds     |
 
-## Development
-To make changes to the game, edit the JavaScript code in the `index.js` file. The game is built using pure vanilla JavaScript, so no external libraries or frameworks are required.
+## Tech stack
+
+- Semantic HTML and accessible patterns (labels, live regions, dialog semantics).
+- CSS custom properties, glass-style UI, responsive layout, and `prefers-reduced-motion` support.
+- JavaScript DOM APIs only — `setInterval` game loop, no dependencies.
+
+## Project layout
+
+| File        | Role                                      |
+| ----------- | ----------------------------------------- |
+| `index.html` | Structure, overlays, HUD, audio elements |
+| `style.css`  | Visual design and responsive rules      |
+| `index.js`   | Game logic and UI state                 |
+
+Graphics and sky imagery are credited below; audio and asset filenames are expected alongside these files.
+
+## Screenshots
+
+**In game**
+
+![Screenshot of the game](https://user-images.githubusercontent.com/54732020/230834111-b251f978-98e6-428d-81c0-938c869d6940.png)
+
+**Game over**
+
+![Screenshot of game over](https://user-images.githubusercontent.com/54732020/230834161-ec7a50ed-49d9-47fe-b6f8-ab7ce5b554c5.png)
 
 ## Credits
-The bird and background graphics were created by [Freepik](https://www.freepik.com/) and are available for free on [Flaticon](https://www.flaticon.com/packs/birds-115).
+
+- Bird and background artwork: [Freepik](https://www.freepik.com/) via [Flaticon — Birds pack](https://www.flaticon.com/packs/birds-115).
 
 ## License
-This game is licensed under the [MIT](https://opensource.org/licenses/MIT) License. Feel free to use it for your own projects or modify it to suit your needs.
+
+[MIT](https://opensource.org/licenses/MIT). Use or modify freely; attribution for third-party art is appreciated.

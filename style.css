@@ -1,72 +1,599 @@
-body{
-	background-image: url('sky-and-clouds.jpg');
-	background-size: cover;
-	height: 100%;
-	}
-.birdTitle {
-	color: gray;
-}
-.startGame{
-	position: absolute;
-	top: 50%;
-	left: 50%;
-}
-#start{
-	background-color: rgb(0,100,100);
-	font-weight: bold;
-	font-size: 15px;
-	border-radius: 15px;
-	width: 100px;
-	height: 50px;
-}
-#start:hover{
-	cursor: pointer;
-	color: skyblue;
-}
-@media only screen and (max-width: 600px) {
-	h1 {
-		font-size: 20px;
-	}
-	h2 {
-		font-size: 15px;
-	}
-  body{
-		background-image: url('sky-and-clouds-rotated.jpg');
-		height: 50%;
-	}
-	.startGame{
-		position: absolute;
-		top: 50%;
-		left: 50%;
-	}
-	#start{
-		background-color: rgb(0,100,100);
-		color: white;
-		font-weight: bold;
-		font-size: 15px;
-		border-radius: 15px;
-		width: 100px;
-		height: 50px;
-	}
-	#start:hover{
-		cursor: pointer;
-		color: skyblue;
-	}
-	img {
-		height: 30px;
-		width: 30px;
-	}
-	.wrapper{
-    transform: rotate(90deg);
-    transform-origin:bottom left;
-    
-    position:absolute;
-    top: -100vw;
-    left: 0;
-    
-    height:100vw;
-    width:100vh;
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Outfit:wght@500;600;700&display=swap");
 
-    overflow:auto;
+/* Design tokens — twilight sky + glass chrome */
+:root {
+	--font-sans: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, sans-serif;
+	--font-display: "Outfit", var(--font-sans);
+	--ink: #0c1222;
+	--ink-soft: rgba(12, 18, 34, 0.72);
+	--mist: rgba(255, 255, 255, 0.14);
+	--glass: rgba(255, 255, 255, 0.12);
+	--glass-strong: rgba(255, 255, 255, 0.2);
+	--stroke: rgba(255, 255, 255, 0.22);
+	--glow: #5eead4;
+	--glow-deep: #0d9488;
+	--accent: #38bdf8;
+	--danger: #fb7185;
+	--shadow-lg: 0 24px 80px rgba(8, 15, 35, 0.45);
+	--shadow-soft: 0 12px 40px rgba(8, 15, 35, 0.28);
+	--radius-lg: 20px;
+	--radius-md: 14px;
+	--radius-pill: 999px;
+	--ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+	--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (prefers-color-scheme: light) {
+	:root {
+		--ink: #0f172a;
+		--ink-soft: rgba(15, 23, 42, 0.78);
+		--mist: rgba(255, 255, 255, 0.35);
+		--glass: rgba(255, 255, 255, 0.45);
+		--glass-strong: rgba(255, 255, 255, 0.65);
+		--stroke: rgba(15, 23, 42, 0.12);
+		--shadow-lg: 0 24px 60px rgba(15, 23, 42, 0.2);
+		--shadow-soft: 0 12px 36px rgba(15, 23, 42, 0.14);
+	}
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	height: 100%;
+	-webkit-text-size-adjust: 100%;
+}
+
+body {
+	margin: 0;
+	min-height: 100%;
+	min-height: 100dvh;
+	overflow: hidden;
+	font-family: var(--font-sans);
+	color: #f8fafc;
+	background: #0b1020 url("sky-and-clouds.jpg") center / cover no-repeat fixed;
+	background-color: #0b1020;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+}
+
+.hidden {
+	display: none !important;
+}
+
+.wrapper {
+	position: relative;
+	min-height: 100vh;
+	min-height: 100dvh;
+	height: 100dvh;
+	max-height: 100dvh;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.wrapper.is-playing .birdTitle {
+	opacity: 0;
+	transform: translateY(-8px);
+	pointer-events: none;
+}
+
+/* Top bar — glass HUD */
+.top-bar {
+	position: relative;
+	z-index: 5;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.85rem clamp(1rem, 4vw, 2rem);
+	padding-top: max(0.85rem, env(safe-area-inset-top));
+	background: linear-gradient(
+		180deg,
+		rgba(8, 12, 28, 0.55) 0%,
+		rgba(8, 12, 28, 0.2) 100%
+	);
+	backdrop-filter: blur(16px) saturate(140%);
+	-webkit-backdrop-filter: blur(16px) saturate(140%);
+	border-bottom: 1px solid var(--stroke);
+}
+
+.brand {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	min-width: 0;
+}
+
+.brand__mark {
+	width: 40px;
+	height: 40px;
+	border-radius: 12px;
+	background: linear-gradient(135deg, var(--glow) 0%, var(--accent) 100%);
+	box-shadow: 0 8px 24px rgba(14, 165, 233, 0.35);
+	flex-shrink: 0;
+}
+
+.brand__text {
+	display: flex;
+	flex-direction: column;
+	gap: 0.1rem;
+	min-width: 0;
+}
+
+.brand__title {
+	font-family: var(--font-display);
+	font-weight: 700;
+	font-size: clamp(1.05rem, 2.5vw, 1.25rem);
+	letter-spacing: -0.02em;
+	line-height: 1.15;
+}
+
+.brand__tag {
+	font-size: 0.72rem;
+	font-weight: 500;
+	text-transform: uppercase;
+	letter-spacing: 0.12em;
+	color: rgba(248, 250, 252, 0.65);
+}
+
+.hud {
+	display: flex;
+	align-items: stretch;
+	gap: 0.5rem;
+}
+
+.hud__item {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	justify-content: center;
+	padding: 0.45rem 0.9rem;
+	min-width: 4.5rem;
+	background: var(--glass);
+	border: 1px solid var(--stroke);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-soft);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	transition: transform 0.25s var(--ease-out), border-color 0.25s ease;
+}
+
+.hud__item--score {
+	background: linear-gradient(145deg, rgba(94, 234, 212, 0.18), var(--glass));
+	border-color: rgba(94, 234, 212, 0.35);
+}
+
+.hud__label {
+	font-size: 0.65rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.14em;
+	color: rgba(248, 250, 252, 0.55);
+}
+
+.hud__value {
+	font-family: var(--font-display);
+	font-weight: 700;
+	font-size: 1.35rem;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -0.03em;
+	line-height: 1.2;
+}
+
+/* Playfield */
+.playfield {
+	flex: 1;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+
+.playfield__inner {
+	position: relative;
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	padding: clamp(0.5rem, 1.5vw, 1rem);
+	padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+}
+
+.birdTitle {
+	position: absolute;
+	left: 50%;
+	top: clamp(3.5rem, 12vh, 5rem);
+	transform: translateX(-50%);
+	text-align: center;
+	z-index: 1;
+	max-width: min(90vw, 28rem);
+	pointer-events: none;
+	transition: opacity 0.45s var(--ease-out), transform 0.45s var(--ease-out);
+}
+
+.birdTitle h1 {
+	font-family: var(--font-display);
+	font-weight: 700;
+	font-size: clamp(1.35rem, 4vw, 2rem);
+	margin: 0 0 0.35rem;
+	letter-spacing: -0.03em;
+	text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
+}
+
+.birdTitle__hint {
+	margin: 0;
+	font-size: clamp(0.85rem, 2.2vw, 0.95rem);
+	color: rgba(248, 250, 252, 0.85);
+	text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
+}
+
+.game-surface {
+	position: relative;
+	flex: 1 1 0;
+	min-height: 0;
+	width: 100%;
+	max-height: min(720px, calc(100dvh - 7.25rem));
+	border-radius: var(--radius-lg);
+	border: 1px solid var(--stroke);
+	background: rgba(8, 12, 28, 0.15);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), var(--shadow-lg);
+	overflow: hidden;
+	z-index: 2;
+	touch-action: manipulation;
+}
+
+/* Overlays */
+.overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 20;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1.5rem;
+	padding: max(1.5rem, env(safe-area-inset-top)) max(1.5rem, env(safe-area-inset-right))
+		max(1.5rem, env(safe-area-inset-bottom)) max(1.5rem, env(safe-area-inset-left));
+	background: radial-gradient(ellipse 120% 80% at 50% 0%, rgba(56, 189, 248, 0.12), transparent 55%),
+		rgba(6, 10, 26, 0.55);
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	animation: overlay-in 0.5s var(--ease-out) both;
+}
+
+.overlay--gameover {
+	background: radial-gradient(ellipse at 50% 20%, rgba(251, 113, 133, 0.15), transparent 50%),
+		rgba(6, 10, 26, 0.65);
+}
+
+@keyframes overlay-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.hero-card,
+.modal-card {
+	width: min(100%, 400px);
+	padding: clamp(1.5rem, 4vw, 2.25rem);
+	border-radius: var(--radius-lg);
+	background: linear-gradient(155deg, var(--glass-strong), var(--glass));
+	border: 1px solid var(--stroke);
+	box-shadow: var(--shadow-lg);
+	backdrop-filter: blur(20px) saturate(160%);
+	-webkit-backdrop-filter: blur(20px) saturate(160%);
+	text-align: center;
+	animation: card-rise 0.55s var(--ease-out) 0.08s both;
+}
+
+@keyframes card-rise {
+	from {
+		opacity: 0;
+		transform: translateY(16px) scale(0.98);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+.hero-card__eyebrow {
+	margin: 0 0 0.5rem;
+	font-size: 0.7rem;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.16em;
+	color: rgba(248, 250, 252, 0.55);
+}
+
+.hero-card__title {
+	font-family: var(--font-display);
+	font-weight: 700;
+	font-size: clamp(1.75rem, 5vw, 2.35rem);
+	margin: 0 0 0.65rem;
+	letter-spacing: -0.04em;
+	background: linear-gradient(120deg, #f8fafc 0%, var(--glow) 45%, var(--accent) 100%);
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+.hero-card__lede {
+	margin: 0 0 1.35rem;
+	font-size: 0.95rem;
+	color: rgba(248, 250, 252, 0.78);
+	line-height: 1.55;
+}
+
+.hero-card__note {
+	margin: 1rem 0 0;
+	font-size: 0.78rem;
+	color: rgba(248, 250, 252, 0.45);
+}
+
+.modal-card__title {
+	font-family: var(--font-display);
+	font-weight: 700;
+	font-size: 1.5rem;
+	margin: 0 0 0.5rem;
+	color: #fecdd3;
+	letter-spacing: -0.02em;
+}
+
+.modal-card__text {
+	margin: 0 0 0.75rem;
+	color: rgba(248, 250, 252, 0.75);
+	font-size: 0.95rem;
+}
+
+.modal-card__score {
+	margin: 0 0 1.35rem;
+	font-size: 1rem;
+	color: rgba(248, 250, 252, 0.88);
+}
+
+.modal-card__score strong {
+	font-family: var(--font-display);
+	font-weight: 700;
+	font-size: 1.35rem;
+	color: var(--glow);
+	font-variant-numeric: tabular-nums;
+}
+
+/* Buttons */
+.btn {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.85rem 1.6rem;
+	font-family: var(--font-sans);
+	font-size: 0.95rem;
+	font-weight: 600;
+	letter-spacing: 0.02em;
+	color: #042f2e;
+	background: linear-gradient(145deg, #5eead4 0%, #2dd4bf 40%, #14b8a6 100%);
+	border: none;
+	border-radius: var(--radius-pill);
+	cursor: pointer;
+	box-shadow: 0 4px 20px rgba(20, 184, 166, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+	transition: transform 0.2s var(--ease-spring), box-shadow 0.25s ease, filter 0.2s ease;
+	overflow: hidden;
+}
+
+.btn:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 3px;
+}
+
+.btn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 28px rgba(20, 184, 166, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+	filter: brightness(1.03);
+}
+
+.btn:active {
+	transform: translateY(0);
+	transition-duration: 0.1s;
+}
+
+.btn__shine {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		105deg,
+		transparent 0%,
+		rgba(255, 255, 255, 0.35) 45%,
+		transparent 55%
+	);
+	transform: translateX(-100%);
+	animation: shine 4s ease-in-out infinite;
+	pointer-events: none;
+}
+
+@keyframes shine {
+	0%,
+	70% {
+		transform: translateX(-100%);
+	}
+	85% {
+		transform: translateX(100%);
+	}
+	100% {
+		transform: translateX(100%);
+	}
+}
+
+/* Game entities */
+.game-surface img {
+	filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.25));
+	transition: transform 0.15s var(--ease-out), filter 0.15s ease;
+}
+
+.game-surface img:hover {
+	transform: scale(1.04);
+	filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.35));
+}
+
+/* Phone landscape — one-screen layout: top bar + full-width playfield */
+@media (orientation: landscape) and (max-height: 640px) {
+	.wrapper {
+		height: 100dvh;
+		max-height: 100dvh;
+		height: 100svh;
+		max-height: 100svh;
+	}
+
+	.top-bar {
+		flex-wrap: nowrap;
+		align-items: center;
+		padding: 0.35rem clamp(0.6rem, 2vw, 1rem);
+		padding-top: max(0.35rem, env(safe-area-inset-top));
+		gap: 0.5rem;
+	}
+
+	.brand__mark {
+		width: 32px;
+		height: 32px;
+		border-radius: 10px;
+	}
+
+	.brand__title {
+		font-size: clamp(0.9rem, 2.8vw, 1.05rem);
+	}
+
+	.brand__tag {
+		display: none;
+	}
+
+	.hud {
+		gap: 0.35rem;
+	}
+
+	.hud__item {
+		min-width: 3.25rem;
+		padding: 0.28rem 0.5rem;
+	}
+
+	.hud__label {
+		font-size: 0.55rem;
+	}
+
+	.hud__value {
+		font-size: 1rem;
+	}
+
+	.playfield__inner {
+		padding: 0.35rem clamp(0.35rem, 1.5vw, 0.65rem);
+		padding-bottom: max(0.35rem, env(safe-area-inset-bottom));
+	}
+
+	.game-surface {
+		max-height: none;
+		flex: 1 1 0;
+		min-height: 0;
+		border-radius: var(--radius-md);
+	}
+
+	.birdTitle h1 {
+		font-size: clamp(1rem, 3.5vw, 1.25rem);
+	}
+
+	.birdTitle__hint {
+		font-size: 0.8rem;
+	}
+
+	.hero-card,
+	.modal-card {
+		width: min(88vw, 320px);
+		padding: 1.15rem 1rem;
+	}
+
+	.hero-card__lede {
+		font-size: 0.88rem;
+	}
+}
+
+/* Portrait phones — rotate UI so birds fly across the long axis */
+@media only screen and (max-width: 600px) and (orientation: portrait) {
+	body {
+		background-image: url("sky-and-clouds-rotated.jpg");
+	}
+
+	h1 {
+		font-size: clamp(1.1rem, 4vw, 1.35rem);
+	}
+
+	.wrapper {
+		height: 100vw;
+		width: 100vh;
+		max-height: none;
+		transform: rotate(90deg);
+		transform-origin: bottom left;
+		position: absolute;
+		top: -100vw;
+		left: 0;
+		overflow: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.top-bar {
+		flex-wrap: wrap;
+	}
+
+	.hud__item {
+		min-width: 4rem;
+		padding: 0.4rem 0.75rem;
+	}
+
+	.hud__value {
+		font-size: 1.15rem;
+	}
+
+	.game-surface {
+		max-height: none;
+		flex: 1 1 0;
+		min-height: 0;
+	}
+
+	.game-surface img {
+		height: 30px !important;
+		width: 30px !important;
+	}
+
+	.hero-card,
+	.modal-card {
+		width: min(92vw, 340px);
+		padding: 1.35rem 1.25rem;
+	}
+}
+
+/* Narrow portrait (no rotation): small phones in default orientation */
+@media only screen and (max-width: 480px) and (orientation: portrait) {
+	.hero-card,
+	.modal-card {
+		width: min(94vw, 360px);
+	}
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+	}
+
+	.btn__shine {
+		display: none;
 	}
 }
