@@ -44,14 +44,24 @@
 
 html {
 	height: 100%;
+	width: 100%;
+	overflow: hidden;
+	overflow-x: clip;
 	-webkit-text-size-adjust: 100%;
 }
 
 body {
 	margin: 0;
+	width: 100%;
+	max-width: 100%;
 	min-height: 100%;
-	min-height: 100dvh;
+	height: 100dvh;
+	max-height: 100dvh;
 	overflow: hidden;
+	overflow-x: clip;
+	overscroll-behavior: none;
+	display: flex;
+	flex-direction: column;
 	font-family: var(--font-sans);
 	color: #f8fafc;
 	background: #0b1020 url("sky-and-clouds.jpg") center / cover no-repeat fixed;
@@ -60,16 +70,40 @@ body {
 	-webkit-font-smoothing: antialiased;
 }
 
+/* Narrow viewports: lock document height; dvh fallback if svh unsupported */
+@media (max-width: 1024px) {
+	html {
+		height: 100dvh;
+		max-height: 100dvh;
+	}
+
+	html {
+		height: 100svh;
+		max-height: 100svh;
+	}
+
+	body {
+		height: 100dvh;
+		max-height: 100dvh;
+		background-attachment: scroll;
+	}
+
+	body {
+		height: 100svh;
+		max-height: 100svh;
+	}
+}
+
 .hidden {
 	display: none !important;
 }
 
 .wrapper {
 	position: relative;
-	min-height: 100vh;
-	min-height: 100dvh;
-	height: 100dvh;
-	max-height: 100dvh;
+	flex: 1 1 auto;
+	min-height: 0;
+	width: 100%;
+	max-width: 100%;
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
@@ -210,7 +244,7 @@ body {
 	transform: translateX(-50%);
 	text-align: center;
 	z-index: 1;
-	max-width: min(90vw, 28rem);
+	max-width: min(28rem, 100%);
 	pointer-events: none;
 	transition: opacity 0.45s var(--ease-out), transform 0.45s var(--ease-out);
 }
@@ -248,7 +282,7 @@ body {
 
 /* Overlays */
 .overlay {
-	position: fixed;
+	position: absolute;
 	inset: 0;
 	z-index: 20;
 	display: flex;
@@ -444,13 +478,6 @@ body {
 
 /* Phone landscape — one-screen layout: top bar + full-width playfield */
 @media (orientation: landscape) and (max-height: 640px) {
-	.wrapper {
-		height: 100dvh;
-		max-height: 100dvh;
-		height: 100svh;
-		max-height: 100svh;
-	}
-
 	.top-bar {
 		flex-wrap: nowrap;
 		align-items: center;
@@ -512,7 +539,8 @@ body {
 
 	.hero-card,
 	.modal-card {
-		width: min(88vw, 320px);
+		width: 100%;
+		max-width: 320px;
 		padding: 1.15rem 1rem;
 	}
 
@@ -521,40 +549,45 @@ body {
 	}
 }
 
-/* Portrait phones — rotate UI so birds fly across the long axis */
-@media only screen and (max-width: 600px) and (orientation: portrait) {
-	body {
-		background-image: url("sky-and-clouds-rotated.jpg");
-	}
-
+/* Touch / small screens — tighter HUD, no horizontal bleed */
+@media (max-width: 600px) {
 	h1 {
 		font-size: clamp(1.1rem, 4vw, 1.35rem);
 	}
 
-	.wrapper {
-		height: 100vw;
-		width: 100vh;
-		max-height: none;
-		transform: rotate(90deg);
-		transform-origin: bottom left;
-		position: absolute;
-		top: -100vw;
-		left: 0;
-		overflow: auto;
-		-webkit-overflow-scrolling: touch;
+	.top-bar {
+		flex-wrap: nowrap;
+		gap: 0.5rem;
+		padding-left: max(0.65rem, env(safe-area-inset-left));
+		padding-right: max(0.65rem, env(safe-area-inset-right));
 	}
 
-	.top-bar {
-		flex-wrap: wrap;
+	.brand {
+		min-width: 0;
+		flex: 1 1 auto;
+	}
+
+	.brand__title {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.brand__tag {
+		display: none;
+	}
+
+	.hud {
+		flex-shrink: 0;
 	}
 
 	.hud__item {
-		min-width: 4rem;
-		padding: 0.4rem 0.75rem;
+		min-width: 0;
+		padding: 0.35rem 0.55rem;
 	}
 
 	.hud__value {
-		font-size: 1.15rem;
+		font-size: 1.05rem;
 	}
 
 	.game-surface {
@@ -563,23 +596,42 @@ body {
 		min-height: 0;
 	}
 
-	.game-surface img {
-		height: 30px !important;
-		width: 30px !important;
-	}
-
 	.hero-card,
 	.modal-card {
-		width: min(92vw, 340px);
-		padding: 1.35rem 1.25rem;
+		width: 100%;
+		max-width: 340px;
+		padding: 1.35rem 1.15rem;
 	}
 }
 
-/* Narrow portrait (no rotation): small phones in default orientation */
-@media only screen and (max-width: 480px) and (orientation: portrait) {
-	.hero-card,
-	.modal-card {
-		width: min(94vw, 360px);
+/* Force landscape presentation when device is physically portrait */
+@media (max-width: 600px) and (orientation: portrait) {
+	body {
+		background-image: url("sky-and-clouds-rotated.jpg");
+	}
+
+	.wrapper {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100dvh;
+		height: 100vw;
+		max-width: none;
+		transform-origin: top left;
+		transform: rotate(90deg) translateY(-100%);
+		overflow: hidden;
+		contain: layout paint;
+	}
+
+	.playfield__inner {
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+}
+
+@media (max-width: 600px) and (orientation: portrait) {
+	.wrapper {
+		width: 100svh;
 	}
 }
 
